@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.spider.img.util.HttpUtil;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,37 +15,37 @@ import java.util.concurrent.BlockingQueue;
  * Created by zhangkai on 17/5/23.
  */
 public class ImgTask implements Runnable {
-    BlockingQueue<JSONArray> htmlQueue;
+    BlockingQueue<JSONArray> grabQueue;
     BlockingQueue<Map<String, List>> imgQueue;
+    String detailUrl;
 
-    public ImgTask(BlockingQueue htmlQueue, BlockingQueue imgQueue) {
-        this.htmlQueue = htmlQueue;
+    public ImgTask(BlockingQueue grabQueue, BlockingQueue imgQueue, String detailUrl) {
+        this.grabQueue = grabQueue;
         this.imgQueue = imgQueue;
+        this.detailUrl = detailUrl;
     }
 
     public void run() {
         while (true) {
             try {
-                JSONArray jsonArray = htmlQueue.take();
-                Map<String, List> productMap = new HashMap<String, List>();
+                JSONArray jsonArray = grabQueue.take();
+                Map<String, List> productMap = new HashMap<>();
                 for (Object obj : jsonArray) {
                     JSONObject json = (JSONObject) obj;
-                    List<String> imgList = new ArrayList<String>();
-                    String title  = json.getString("title");
+                    List<String> imgList = Arrays.asList();
+                    String title = json.getString("title");
                     String url = json.getString("url");
-                    String id = url.substring(url.indexOf("/search/")+8,url.indexOf("?"));
+                    String id = url.substring(url.indexOf("/search/") + 8, url.indexOf("?"));
                     String response = HttpUtil.sendGet(getUrl(id));
                     JSONObject jsonObject = JSON.parseObject(response);
                     JSONArray picArray = jsonObject.getJSONArray("results");
-                    for(Object pic : picArray){
+                    for (Object pic : picArray) {
                         JSONObject picJson = (JSONObject) pic;
                         String imageUrl = picJson.getString("webImageUrl");
                         imgList.add(imageUrl);
                     }
                     productMap.put(title, imgList);
-                    Map<String, List> map =new HashMap<String, List>();
-                    map.putAll(productMap);
-                    imgQueue.put(map);
+                    imgQueue.put(new HashMap<>(productMap));
                     productMap.clear();
                 }
 
@@ -56,7 +56,7 @@ public class ImgTask implements Runnable {
 
     }
 
-    public String getUrl(String id){
-        return String.format("http://www.metmuseum.org/api/Collection/additionalImages?crdId=%s&page=1&perPage=50",id);
+    public String getUrl(String id) {
+        return String.format(detailUrl, id);
     }
 }

@@ -1,6 +1,5 @@
 package com.spider.img.util;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -14,7 +13,7 @@ import java.io.IOException;
  */
 public class HttpUtil {
 
-    public static String sendGet(String url){
+    public static String sendGet(String url) {
         String responseStr = null;
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -22,15 +21,14 @@ public class HttpUtil {
             CloseableHttpResponse response = null;
             try {
                 response = httpClient.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                responseStr = EntityUtils.toString(entity, "UTF-8");
+                responseStr = EntityUtils.toString(response.getEntity(), "UTF-8");
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 httpClient.close();
                 response.close();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return responseStr;

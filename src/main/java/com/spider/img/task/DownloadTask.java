@@ -15,31 +15,30 @@ import java.util.concurrent.BlockingQueue;
  */
 public class DownloadTask implements Runnable {
 
-    BlockingQueue<Map<String,List>> imgQueue;
+    BlockingQueue<Map<String, List>> imgQueue;
+
     public DownloadTask(BlockingQueue imgQueue) {
         this.imgQueue = imgQueue;
     }
 
     public void run() {
-        while (true){
+        while (true) {
             try {
                 Map<String, List> productMap = imgQueue.take();
-                for (Map.Entry<String ,List> map : productMap.entrySet()){
-                    downloadPicture(map.getKey(), map.getValue());
-                }
-            }catch (Exception e){
+                productMap.forEach((k, v) -> downloadPicture(k, v));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
     }
 
-    private void downloadPicture(String title,List<String> urlList) {
+    private void downloadPicture(String title, List<String> urlList) {
         URL url = null;
         int imageNumber = 1;
-        String downloadDir = "/Users/maxent/Documents/images/"+title;
+        String downloadDir = "/Users/maxent/Documents/images/" + title;
         File downloadFilePath = new File(downloadDir);
-        if(!downloadFilePath.exists()) downloadFilePath.mkdirs();
+        if (!downloadFilePath.exists()) downloadFilePath.mkdirs();
 
         for (String urlString : urlList) {
             try {

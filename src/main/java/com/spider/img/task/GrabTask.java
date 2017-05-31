@@ -10,14 +10,16 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Created by zhangkai on 17/5/23.
  */
-public class HtmlTask implements Runnable {
+public class GrabTask implements Runnable {
 
+    String url;
     Integer offset;
     Integer perPage;
     BlockingQueue<JSONArray> htmlQueue;
 
-    public HtmlTask(BlockingQueue htmlQueue, Integer offset, Integer perPage) {
+    public GrabTask(BlockingQueue htmlQueue, String url, Integer offset, Integer perPage) {
         this.htmlQueue = htmlQueue;
+        this.url = url;
         this.offset = offset;
         this.perPage = perPage;
     }
@@ -37,8 +39,8 @@ public class HtmlTask implements Runnable {
     }
 
     public synchronized String getUrl() {
-        String url = String.format("http://www.metmuseum.org/api/collection/collectionlisting?artist=&department=&era=&geolocation=&material=&offset=%d&pageSize=0&perPage=%d&q=china&showOnly=&sortBy=Relevance&sortOrder=asc", offset, perPage);
+        String u = String.format(url, offset, perPage);
         offset += perPage;
-        return url;
+        return u;
     }
 }
